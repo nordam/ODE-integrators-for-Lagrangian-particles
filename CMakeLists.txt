@@ -21,17 +21,29 @@ set (CMAKE_Fortran_FLAGS_RELEASE "-funroll-loops -O3 -mtune=native")
 set (fortran_modules
     "src/parameters.f90"
     "src/interpolator.f90"
-    "src/integrators.f90"
+    "src/integrator.f90"
+    "src/experiment.f90"
+    "src/output.f90"
     )
+
+
+# Using hdf5 to store output
+find_package (HDF5 COMPONENTS HL Fortran_HL Fortran)
+include_directories (${HDF5_INCLUDE_DIRS})
+message ("++ HDF5_LIBRARIES:       ${HDF5_LIBRARIES}")
+message ("++ HDF5_INCLUDE_DIRS:    ${HDF5_INCLUDE_DIRS}")
 
 
 # Need to link to the bspline-fortran library
 # https://github.com/jacobwilliams/bspline-fortran
-message ("++ Bspline library path: ${BSPLINE_LIBRARY_PATH}")
 file (GLOB BSPLINE_LIBRARIES "${BSPLINE_LIBRARY_PATH}/*.so")
 include_directories (${BSPLINE_LIBRARY_PATH})
+message ("++ BSPLINE_LIBRARY_PATH: ${BSPLINE_LIBRARY_PATH}")
+message ("++ BSPLINE_LIBRARIES:    ${BSPLINE_LIBRARIES}")
+
 
 
 #### Simple test program
 add_executable (testprogram "src/test.f90" ${fortran_modules})
 target_link_libraries (testprogram ${BSPLINE_LIBRARIES})
+target_link_libraries (testprogram ${HDF5_LIBRARIES})
