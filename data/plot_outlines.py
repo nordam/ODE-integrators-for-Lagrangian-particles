@@ -56,7 +56,7 @@ def main():
     # setup stereographic basemap.
     # lat_ts is latitude of true scale.
     # lon_0,lat_0 is central point.
-    fig = plt.figure(figsize = (10,7))
+    fig = plt.figure(figsize = (6,4))
     ax  = fig.add_subplot(111)
     width = 1500000
     m = Basemap(width=width,height=0.7*width,
@@ -84,7 +84,7 @@ def main():
 
     plt.legend(loc = 'upper right')
     plt.tight_layout()
-    plt.savefig('map.png', dpi = 240)
+    plt.savefig('outlines.png', dpi = 180)
 
 
 if __name__ == '__main__':
