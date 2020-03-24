@@ -4,7 +4,7 @@ program test
     use interpolator_module, only: interpolator
     use integrator_module,   only: rk1, bs32
     use integrator_module,   only: integrate_fixed, integrate_variable
-    use experiment_module,   only: experiment_fixed
+    use experiment_module,   only: experiment_fixed, experiment_variable
 
     implicit none
 
@@ -18,8 +18,10 @@ program test
 
     real(WP), dimension(2,10) :: X
     real(WP), dimension(7) :: timesteps
+    real(WP), dimension(7) :: tolerances
 
-    timesteps = (/ 1.0, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01 /)
+    timesteps = (/ 1.0_WP, 0.5_WP, 0.2_WP, 0.1_WP, 0.05_WP, 0.02_WP, 0.01_WP /)
+    tolerances = (/ 1e-4_WP, 5e-5_WP, 2e-5_WP, 1e-5_WP, 5e-6_WP, 2e-6_WP, 1e-6_WP /)
 
 
     xc = (/ -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5 /)
@@ -58,7 +60,10 @@ program test
     print*, 'Numerical:  ', X(:,1)
     print*, 'Accepted steps: ', na, 'Rejected steps: ', nr
 
-    call experiment_fixed(X, t0, tmax, timesteps, f, rk1, 'testfile.hdf5')
+    X(1,:) =  4
+    x(2,:) = -3
+    call experiment_fixed(X, t0, tmax, timesteps, f, rk1, 'testfile_fixed.hdf5')
+    call experiment_variable(X, t0, tmax, tolerances, f, bs32, 'testfile_variable.hdf5')
 
 
 end program

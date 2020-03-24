@@ -90,6 +90,8 @@ module integrator_module
         Naccepted = 0
         Nrejected = 0
         ! Evaluate k1 for first step (FSAL)
+        ! Not all integrators can make use of this, but to keep the code simple
+        ! they all take this as an argument.
         k1 = f % eval(X, t)
 
         ! Loop over timesteps until t == tmax

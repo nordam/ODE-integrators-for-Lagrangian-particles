@@ -14,12 +14,12 @@ type interpolator
     contains
         private
         procedure, public  :: eval => evaluate
-        procedure, public  :: init => initialise
+        procedure, public  :: init => initialize
 end type interpolator
 
 contains
 
-    subroutine initialise(this, xc, yc, tc, gvx, gvy, order)
+    subroutine initialize(this, xc, yc, tc, gvx, gvy, order)
         implicit none
         class(interpolator), intent(inout)     :: this
         real(WP), intent(in), dimension(:)     :: xc, yc, tc
@@ -28,28 +28,42 @@ contains
         integer                                :: iflag
         call this%fvx%initialize(xc, yc, tc, gvx, order, order, order, iflag)
         if (iflag /= 0) then
-            print*, this % fvx % status_message(iflag)
+            print*, this%fvx%status_message(iflag)
         endif
         call this%fvy%initialize(xc, yc, tc, gvy, order, order, order, iflag)
         if (iflag /= 0) then
-            print*, this % fvy % status_message(iflag)
+            print*, this%fvy%status_message(iflag)
         endif
     end subroutine
 
     function evaluate(this, X, t) result(V)
         implicit none
-        ! inputs
+        !!!! inputs !!!!
         class(interpolator),    intent(inout) :: this
         real(WP), dimension(2), intent(in)    :: X
         real(WP),               intent(in)    :: t
-        ! output
+
+        !!!! output !!!!
+        ! velocity vector to return
         real(WP), dimension(2)                :: V
-        ! local variables
+
+        !!!! local variables !!!!
+        ! status flag
         integer                               :: iflag
+        ! order of derivative to return (0 returns the function value itself)
         integer, parameter                    :: d = 0
 
+        ! Interpolate x-component of velocity
         call this%fvx%evaluate(X(1), X(2), t, d, d, d, V(1), iflag)
+        if (iflag /= 0) then
+            print*, this%fvx%status_message(iflag)
+        endif
+
+        ! Interpolate y-component of velocity
         call this%fvy%evaluate(X(1), X(2), t, d, d, d, V(2), iflag)
+        if (iflag /= 0) then
+            print*, this%fvy%status_message(iflag)
+        endif
     end function
 
 end module interpolator_module

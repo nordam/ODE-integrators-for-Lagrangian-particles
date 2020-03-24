@@ -4,12 +4,12 @@ module experiment_module
     use h5lt
     use parameters,          only: SP, DP, WP
     use interpolator_module, only: interpolator
-    use integrator_module,   only: integrate_fixed
+    use integrator_module,   only: integrate_fixed, integrate_variable
     use output_module,       only: write_to_hdf5, create_hdf5_file, close_hdf5_file
 
     implicit none
     private
-    public :: experiment_fixed
+    public :: experiment_fixed, experiment_variable
 
     contains
 
@@ -85,7 +85,7 @@ module experiment_module
     !!!! Subroutine to run experiment with variable-step Runge-Kutta method !!!!
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    subroutine experiment_variable(X0, t0, tmax, tolerances, f, method, outputfile)
+    subroutine experiment_variable(X0, t0, tmax, tolerances, f, method, outputfile, h0input)
         ! This subroutine takes the initial positions at time t0, for a number,
         ! Np, of particles, along with a list of timesteps, an interpolator
         ! object to evaluate the velocity field, and a numerical ODE integrator.
@@ -96,50 +96,62 @@ module experiment_module
         real(WP), dimension(:,:), intent(in)    :: X0
         real(WP), dimension(:),   intent(in)    :: tolerances
         real(WP),                 intent(in)    :: t0, tmax
+        real(WP), optional,       intent(in)    :: h0input
         character(len=*),         intent(in)    :: outputfile
         type(interpolator),       intent(inout) :: f
         interface
-            subroutine method(X, t, h, f)
+            subroutine method(X, t, h, f, k1, atol, rtol, accepted)
                 import :: WP, interpolator
-                real(WP), intent(inout), dimension(:)   :: X
-                real(WP), intent(inout)                 :: t
-                real(WP), intent(in)                    :: h
+                real(WP), intent(inout), dimension(:)   :: X, k1
+                real(WP), intent(inout)                 :: t, h
+                real(WP), intent(in)                    :: atol, rtol
                 type(interpolator), intent(inout)       :: f
+                logical, intent(out)                    :: accepted
             end subroutine method
         end interface
         ! local variables
         real(WP), dimension(:,:), allocatable   :: X
         integer(hid_t)                          :: file_id
         integer                                 :: n, idt, Np
-        integer(DP)                             :: Nsteps
-        real(WP)                                :: h, tic, toc
+        integer(DP)                             :: Naccepted, Nrejected
+        real(WP)                                :: h0, atol, rtol, tic, toc
 
         ! Assuming that X0 has shape (2, Np) or (3, Np)
         ! depending on two or three dimensions
         Np = size(X0, 2)
-        allocate(X(2, Np))
+        allocate(X( size(X0,1), size(X0,2) ))
 
         ! Create file for output
         call create_hdf5_file(outputfile, file_id)
 
-        ! Scan through timesteps
-        do idt = 1, size(timesteps)
-            h = timesteps(idt)
+        ! Initial timestep, setting default value if not supplied
+        if (present(h0input)) then
+            h0 = h0input
+        else
+            h0 = (Tmax - t0)/100
+        endif
+
+        ! Scan through tolerances
+        do idt = 1, size(tolerances)
+            ! Set tolerances (using atol = rtol for now)
+            atol = tolerances(idt)
+            rtol = tolerances(idt)
             ! Reset initial positions
             X = X0
             ! Measure computational time
             call cpu_time(tic)
             ! Transport each particle from time t0 to tmax
             do n = 1, Np
-                call integrate_fixed(X(:,n), t0, tmax, h, f, method, Nsteps)
+                call integrate_variable(X(:,n), t0, tmax, h0, f, method, &
+                        atol, rtol, Naccepted, Nrejected)
             end do
             ! Measure computational time
             call cpu_time(toc)
             ! Write end positions to hdf5 file
-            call write_to_hdf5(file_id, X, timesteps(idt))
+            call write_to_hdf5(file_id, X, tolerances(idt))
             ! Print information on timing and number of steps:
-            ! filename, timestep, runtime, accepted steps, rejected steps
-            print*, trim(outputfile), timesteps(idt), toc - tic, Nsteps, 0
+            ! filename, tolerance, runtime, accepted steps, rejected steps
+            print*, trim(outputfile), tolerances(idt), toc - tic, Naccepted, Nrejected
             flush(6)
         end do
         ! Clean up
