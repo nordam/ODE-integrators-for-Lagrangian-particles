@@ -21,7 +21,7 @@ contains
         real(SP) :: scale_factor, add_offset, fill_value
         real(SP), allocatable, dimension(:,:,:) :: u_, v_
         ! file and variable ids, etc
-        integer :: ndims, nvars, nx, ny, nt
+        integer :: nx, ny, nt
         integer :: ncid
         integer :: u_id, v_id, t_id, x_id, y_id
         integer :: t_dim_id, x_dim_id, y_dim_id
@@ -48,9 +48,9 @@ contains
         call check( nf90_inq_varid(ncid, v_name, v_id) )
 
         ! Get the lengths of the dimensions
-        call check( nf90_inquire_dimension(ncid, x_dim_id, len=nx)
-        call check( nf90_inquire_dimension(ncid, y_dim_id, len=ny)
-        call check( nf90_inquire_dimension(ncid, t_dim_id, len=nt)
+        call check( nf90_inquire_dimension(ncid, x_dim_id, len=nx) )
+        call check( nf90_inquire_dimension(ncid, y_dim_id, len=ny) )
+        call check( nf90_inquire_dimension(ncid, t_dim_id, len=nt) )
 
         ! Allocate arrays for dimensions
         allocate(xc(nx))
@@ -101,6 +101,13 @@ contains
         ! Clean up temporary arrays
         deallocate(u_)
         deallocate(v_)
-
     end subroutine
+
+    subroutine check(status)
+        integer, intent ( in) :: status
+        if (status /= nf90_noerr) then
+            print *, trim(nf90_strerror(status))
+            stop "Stopped"
+      end if
+    end subroutine check
 end module

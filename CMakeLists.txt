@@ -19,11 +19,13 @@ set (CMAKE_Fortran_FLAGS_RELEASE "-funroll-loops -O3 -mtune=native")
 
 # Files with modules and stuff
 set (fortran_modules
-    "src/parameters.f90"
-    "src/interpolator.f90"
-    "src/integrator.f90"
+    "src/currentdata.f90"
     "src/experiment.f90"
+    "src/input.f90"
+    "src/integrator.f90"
+    "src/interpolator.f90"
     "src/output.f90"
+    "src/parameters.f90"
     )
 
 
@@ -33,6 +35,11 @@ include_directories (${HDF5_INCLUDE_DIRS})
 message ("++ HDF5_LIBRARIES:       ${HDF5_LIBRARIES}")
 message ("++ HDF5_INCLUDE_DIRS:    ${HDF5_INCLUDE_DIRS}")
 
+# Using netCDF to read current data from files
+file (GLOB  NETCDF_LIBRARIES  "${NETCDF_LIBRARY_PATH}/libnetcdf*.so")
+include_directories (${NETCDF_INCLUDE_DIRS})
+message ("++ NETCDF_LIBRARIES:     ${NETCDF_LIBRARIES}")
+message ("++ NETCDF_INCLUDE_DIRS:  ${NETCDF_INCLUDE_DIRS}")
 
 # Need to link to the bspline-fortran library
 # https://github.com/jacobwilliams/bspline-fortran
@@ -42,8 +49,14 @@ message ("++ BSPLINE_LIBRARY_PATH: ${BSPLINE_LIBRARY_PATH}")
 message ("++ BSPLINE_LIBRARIES:    ${BSPLINE_LIBRARIES}")
 
 
-
 #### Simple test program
 add_executable (testprogram "src/test.f90" ${fortran_modules})
 target_link_libraries (testprogram ${BSPLINE_LIBRARIES})
 target_link_libraries (testprogram ${HDF5_LIBRARIES})
+target_link_libraries (testprogram ${NETCDF_LIBRARIES})
+
+#### Simple test program with current data
+add_executable (run "src/run.f90" ${fortran_modules})
+target_link_libraries (run ${BSPLINE_LIBRARIES})
+target_link_libraries (run ${HDF5_LIBRARIES})
+target_link_libraries (run ${NETCDF_LIBRARIES})

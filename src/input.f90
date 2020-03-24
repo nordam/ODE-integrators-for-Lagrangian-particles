@@ -52,7 +52,7 @@ module input_module
             ! Output
             real(WP), allocatable, dimension(:,:),  intent(out) :: X0
             ! local variables
-            integer :: Np, i
+            integer :: Np, i, iostatus
             ! Number of dimensions, hardcoding for now
             integer, parameter :: Ndims = 2
 
