@@ -141,12 +141,12 @@ module integrator_module
         ! See, e.g., Griffiths (2010, pp. 44--45)
         implicit none
         ! IO
-        real(WP), intent(inout), dimension(2)   :: X
+        real(WP), intent(inout), dimension(:)   :: X
         real(WP), intent(inout)                 :: t
         real(WP), intent(in)                    :: h
         type(interpolator), intent(inout)       :: f
         ! Local variables
-        real(WP), dimension(2)                  ::  k1, k2
+        real(WP), dimension(size(X))            ::  k1, k2
 
         ! Evaluations of f(x, t)
         k1 = f % eval(X,        t)
@@ -163,12 +163,12 @@ module integrator_module
         ! See, e.g., Griffiths (2010, p. 131)
         implicit none
         ! IO
-        real(WP), intent(inout), dimension(2)   :: X
+        real(WP), intent(inout), dimension(:)   :: X
         real(WP), intent(inout)                 :: t
         real(WP), intent(in)                    :: h
         type(interpolator), intent(inout)       :: f
         ! Local variables
-        real(WP), dimension(2)                  ::  k1, k2, k3
+        real(WP), dimension(size(X))            ::  k1, k2, k3
 
         ! Evaluations of f(x, t)
         k1 = f % eval(X,                   t)
@@ -186,12 +186,12 @@ module integrator_module
         ! See, e.g., Griffiths (2010, p. 131)
         implicit none
         ! IO
-        real(WP), intent(inout), dimension(2)   :: X
+        real(WP), intent(inout), dimension(:)   :: X
         real(WP), intent(inout)                 :: t
         real(WP), intent(in)                    :: h
         type(interpolator), intent(inout)       :: f
         ! Local variables
-        real(WP), dimension(2)                  ::  k1, k2, k3, k4
+        real(WP), dimension(size(X))            ::  k1, k2, k3, k4
 
         ! Evaluations of f(x, t)
         k1 = f % eval( X,          t       )
@@ -240,7 +240,7 @@ module integrator_module
         if (err < 1.0_wp) then
             ! Step is accepted
             accepted = .true.
-        else:
+        else
             ! Step is rejected
             accepted = .false.
         endif
@@ -301,7 +301,7 @@ module integrator_module
 
         ! these are 2nd and 3rd order methods, q = min(2, 3)
         q  = 2.0_wp
-        call adjust_timestep(X2, X3, q, atol, rtol, h, accepted)
+        call adjust_timestep(X2, X3, q, atol, rtol, h, h_new, accepted)
         if (accepted) then
             ! Step is accepted, update, X, t and h
             ! (using 3rd order result to proceed)
@@ -327,15 +327,15 @@ module integrator_module
 
         implicit none
         ! IO
-        real(WP), intent(inout), dimension(2)   :: X, k1
+        real(WP), intent(inout), dimension(:)   :: X, k1
         real(WP), intent(inout)                 :: t, h
         real(WP), intent(in)                    :: atol, rtol
         logical,  intent(out)                   :: accepted
         type(interpolator), intent(inout)       :: f
         ! Local variables
         ! variables needed for stepsize control
-        real(WP), dimension(size(X))    :: X4, X5, sc
-        real(WP)                        :: q, err, h_opt
+        real(WP), dimension(size(X))    :: X4, X5
+        real(WP)                        :: q, h_new
         ! Evaluations of f(x, t)
         real(WP), dimension(size(X))    ::  k2, k3, k4, k5, k6, k7
 
@@ -406,7 +406,7 @@ module integrator_module
 
         ! these are 4th and 5th order methods, q = min(4, 5)
         q  = 4.0_wp
-        call adjust_timestep(X4, X5, q, atol, rtol, h, accepted)
+        call adjust_timestep(X4, X5, q, atol, rtol, h, h_new, accepted)
         if (accepted) then
             ! Step is accepted, update, X, t and h
             ! (using 5th order result to proceed)
@@ -423,7 +423,7 @@ module integrator_module
     end subroutine
 
 
-    subroutine dp87(X, t, h, f, k1_, atol, rtol)
+    subroutine dp87(X, t, h, f, k1_, atol, rtol, accepted)
         ! Dormand-Prince 8(7) method. Implemented after
         ! See Prince & Dormand (1981)
         implicit none
@@ -433,7 +433,7 @@ module integrator_module
         ! thus k1_ is just an unused argument to keep function
         ! signature consistent with the other methods.
         !
-        real(WP), intent(in),    dimension(:)   :: k1_
+        real(WP), intent(inout), dimension(:)   :: k1_
         real(WP), intent(inout)                 :: t, h
         real(WP), intent(in)                    :: atol, rtol
         logical,  intent(out)                   :: accepted
@@ -590,7 +590,7 @@ k13 = f%eval(X+h*(a131*k1+a132*k2+a133*k3+a134*k4+a135*k5+a136*k6+a137*k7+a138*k
 
         ! these are 7th and 8th order methods, q = min(7, 8)
         q   = 7.0_wp
-        call adjust_timestep(X7, X8, q, atol, rtol, h, accepted)
+        call adjust_timestep(X7, X8, q, atol, rtol, h, h_new, accepted)
         if (accepted) then
             ! Step is accepted, update, X, t and h
             ! (using 8th order result to proceed)

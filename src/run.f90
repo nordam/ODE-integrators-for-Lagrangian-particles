@@ -4,7 +4,8 @@ use parameters,             only: SP, DP, WP
 use input_module,           only: read_initial_positions
 use currentdata_module,     only: get_current
 use interpolator_module,    only: interpolator
-use integrator_module,      only: rk1, bs32
+use integrator_module,      only: rk1, rk2, rk3, rk4
+use integrator_module,      only: bs32, dp54, dp87
 use experiment_module,      only: experiment_fixed, experiment_variable
 
 implicit none
@@ -55,7 +56,7 @@ tolerances = (/ 1e-3_WP, 1e-4_WP, 1e-5_WP, 1e-6_WP, 1e-7_WP /)
 ! Get data from NetCDF file
 call get_current(currentfilename, u, v, xc, yc, tc)
 ! Create interpolator from discrete data !!!!
-call f%init(xc, yc, tc, u, v, 2)
+call f%init(xc, yc, tc, u, v, 6)
 ! Deallocate temporary storage arrays
 ! (data is now copied and stored in interpolator)
 deallocate(u)
@@ -77,6 +78,15 @@ tmax = tc(18)
 outputfilename = 'experiment_rk1_linear.hdf5'
 call experiment_fixed(X0, t0, tmax, timesteps, f, rk1, outputfilename)
 
+outputfilename = 'experiment_rk2_linear.hdf5'
+call experiment_fixed(X0, t0, tmax, timesteps, f, rk2, outputfilename)
+
+outputfilename = 'experiment_rk3_linear.hdf5'
+call experiment_fixed(X0, t0, tmax, timesteps, f, rk3, outputfilename)
+
+outputfilename = 'experiment_rk4_linear.hdf5'
+call experiment_fixed(X0, t0, tmax, timesteps, f, rk4, outputfilename)
+
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -85,6 +95,12 @@ call experiment_fixed(X0, t0, tmax, timesteps, f, rk1, outputfilename)
 
 outputfilename = 'experiment_bs32_linear.hdf5'
 call experiment_variable(X0, t0, tmax, tolerances, f, bs32, outputfilename, h0input = h0)
+
+outputfilename = 'experiment_dp54_linear.hdf5'
+call experiment_variable(X0, t0, tmax, tolerances, f, dp54, outputfilename, h0input = h0)
+
+outputfilename = 'experiment_dp87_linear.hdf5'
+call experiment_variable(X0, t0, tmax, tolerances, f, dp87, outputfilename, h0input = h0)
 
 
 end program
