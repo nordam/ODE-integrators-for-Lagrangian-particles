@@ -6,7 +6,8 @@ module integrator_module
     implicit none
     private
     public :: integrate_fixed, integrate_variable
-    public :: rk1, bs32
+    public :: rk1, rk2, rk3, rk4
+    public :: bs32
 
 
     contains
@@ -131,6 +132,75 @@ module integrator_module
 
         ! Next position
         X  = X + h*k1
+        t  = t + h
+    end subroutine
+
+    subroutine rk2(X, t, h, f)
+        ! Make one step with the explicit trapezoid method.
+        ! Calculates next position using timestep h.
+        ! See, e.g., Griffiths (2010, pp. 44--45)
+        implicit none
+        ! IO
+        real(WP), intent(inout), dimension(2)   :: X
+        real(WP), intent(inout)                 :: t
+        real(WP), intent(in)                    :: h
+        type(interpolator), intent(inout)       :: f
+        ! Local variables
+        real(WP), dimension(2)                  ::  k1, k2
+
+        ! Evaluations of f(x, t)
+        k1 = f % eval(X,        t)
+        k2 = f % eval(X + k1*h, t+h)
+
+        ! Next position
+        X  = X + h*(k1 + k2)/2
+        t  = t + h
+    end subroutine
+
+    subroutine rk3(X, t, h, f)
+        ! Make one step with Kutta's method.
+        ! Calculates next position using timestep h.
+        ! See, e.g., Griffiths (2010, p. 131)
+        implicit none
+        ! IO
+        real(WP), intent(inout), dimension(2)   :: X
+        real(WP), intent(inout)                 :: t
+        real(WP), intent(in)                    :: h
+        type(interpolator), intent(inout)       :: f
+        ! Local variables
+        real(WP), dimension(2)                  ::  k1, k2, k3
+
+        ! Evaluations of f(x, t)
+        k1 = f % eval(X,                   t)
+        k2 = f % eval(X + k1*h/2,          t + h/2)
+        k3 = f % eval(X - k1*h   + 2*k2*h, t + h)
+
+        ! Next position
+        X  = X + h*(k1 + 4*k2 + k3)/6
+        t  = t + h
+    end subroutine
+
+    subroutine rk4(X, t, h, f)
+        ! Make one step with the classic 4th-order Runge-Kutta method.
+        ! Calculates next position using timestep h.
+        ! See, e.g., Griffiths (2010, p. 131)
+        implicit none
+        ! IO
+        real(WP), intent(inout), dimension(2)   :: X
+        real(WP), intent(inout)                 :: t
+        real(WP), intent(in)                    :: h
+        type(interpolator), intent(inout)       :: f
+        ! Local variables
+        real(WP), dimension(2)                  ::  k1, k2, k3, k4
+
+        ! Evaluations of f(x, t)
+        k1 = f % eval( X,          t       )
+        k2 = f % eval( X + k1*h/2, t + h/2 )
+        k3 = f % eval( X + k2*h/2, t + h/2 )
+        k4 = f % eval( X + k3*h,   t + h   )
+
+        ! Next position
+        X  = X + h*(k1 + 2*k2 + 2*k3 + k4)/6
         t  = t + h
     end subroutine
 
