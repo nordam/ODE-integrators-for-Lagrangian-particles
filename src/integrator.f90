@@ -5,12 +5,13 @@ module integrator_module
 
     implicit none
     private
-    public :: integrate_fixed, integrate_variable
+    public :: integrate_fixed, integrate_variable, integrate_special
     public :: rk1, rk2, rk3, rk4
     public :: bs32, dp54, dp87
 
 
     contains
+
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !!!!     Subroutines to integrate ODEs     !!!!
@@ -99,7 +100,91 @@ module integrator_module
         do while (t < tmax)
             ! Adjust last timestep to stop exactly at tmax
             h = min(h, tmax - t)
+            ! Make step
             call method(X, t, h, f, k1, atol, rtol, accepted)
+            ! Increment counters
+            if (accepted) then
+                Naccepted = Naccepted + 1
+            else
+                Nrejected = Nrejected + 1
+            endif
+        end do
+    end subroutine
+
+    subroutine integrate_special(X, t0, tmax, h0, stoptimes, f, method, atol, rtol, Naccepted, Nrejected)
+        ! Calculates X(t=tmax) as defined by the ODE x' = f(x, t),
+        ! with initial value, X(t=0), given by X at input.
+        ! Solution is found by repeatedly calling a variable-step
+        ! Runge-Kutta method, using tolerance parameters atol and rtol
+        ! to dynamically adjust the timestep, with initial timestep h0.
+        ! The routine adjusts the last timestep to stop exactly at tmax,
+        ! and returns the last position.
+        ! Additionally, the routines takes a list of times, stoptimes, at which
+        ! there are discontinuities in the data. Integration is stopped and
+        ! restarted at these times.
+        ! On output, the variables Naccepted and Nrejected contain the number
+        ! of accepted and rejected steps respectively.
+        implicit none
+        ! IO
+        real(WP), intent(inout), dimension(:)   :: X
+        real(WP), intent(in),    dimension(:)   :: stoptimes
+        real(WP), intent(in)                    :: t0, tmax, h0, atol, rtol
+        type(interpolator), intent(inout)       :: f
+        integer(WP), intent(out)                :: Naccepted, Nrejected
+        interface
+            subroutine method(X, t, h, f, k1, atol, rtol, accepted)
+                import :: WP, interpolator
+                real(WP), intent(inout), dimension(:)   :: X, k1
+                real(WP), intent(inout)                 :: t, h
+                real(WP), intent(in)                    :: atol, rtol
+                type(interpolator), intent(inout)       :: f
+                logical, intent(out)                    :: accepted
+            end subroutine method
+        end interface
+        ! local variables
+        real(WP), dimension(size(X)) :: k1
+        real(WP) :: t, h, tstop
+        logical  :: accepted
+
+        ! Initialise
+        t = t0
+        h = h0
+        Naccepted = 0
+        Nrejected = 0
+        ! Set tstop to the smallest number in the list of stoptimes,
+        ! which is still larger than t0.
+        tstop = t0 - 1
+        do i = 1, size(stoptimes)
+            if ( (tstop < t0) .and. (t0 < stoptimes(i)) ) then
+                tstop = stoptimes(i)
+            endif
+        enddo
+        ! Evaluate k1 for first step (FSAL)
+        ! Not all integrators can make use of this, but to keep the code simple
+        ! they all take this as an argument.
+        k1 = f % eval(X, t)
+
+        ! Loop over timesteps until t == tmax
+        do while (t < tmax)
+            ! Adjust last timestep to stop exactly at tmax
+            h = min(h, tmax - t)
+            ! Handle discontinuities
+            if ( (t < tstop) .and. (tstop < (t + h)) ) then
+                ! About to step across a discontinuity.
+                ! Keep track of the current timestep.
+                h_old = h
+                ! Calculate remaining time until discontinuity.
+                h = tdata - t
+                ! Make step
+                call method(X, t, h, f, k1, atol, rtol, accepted)
+                ! Set timestep back to old value if step was accepted
+                if (accepted) h = h_old
+            else
+                ! Normal step, away from any discontinuities
+                ! Make step
+                call method(X, t, h, f, k1, atol, rtol, accepted)
+            endif
+            ! Increment counters
             if (accepted) then
                 Naccepted = Naccepted + 1
             else

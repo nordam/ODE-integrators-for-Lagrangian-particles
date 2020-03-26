@@ -6,7 +6,7 @@ use currentdata_module,     only: get_current
 use interpolator_module,    only: interpolator
 use integrator_module,      only: rk1, rk2, rk3, rk4
 use integrator_module,      only: bs32, dp54, dp87
-use experiment_module,      only: experiment_fixed, experiment_variable
+use experiment_module,      only: experiment_fixed, experiment_variable, experiment_special
 
 implicit none
 
@@ -101,6 +101,23 @@ call experiment_variable(X0, t0, tmax, tolerances, f, dp54, outputfilename, h0in
 
 outputfilename = 'experiment_dp87_linear.hdf5'
 call experiment_variable(X0, t0, tmax, tolerances, f, dp87, outputfilename, h0input = h0)
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!! Run experiments with special-purpose integrators !!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Passing list of timestamps for the currentdata as stoptimes
+
+outputfilename = 'experiment_bs32_special_linear.hdf5'
+call experiment_special(X0, t0, tmax, tc, tolerances, f, bs32, outputfilename, h0input = h0)
+
+outputfilename = 'experiment_dp54_special_linear.hdf5'
+call experiment_special(X0, t0, tmax, tc, tolerances, f, dp54, outputfilename, h0input = h0)
+
+outputfilename = 'experiment_dp87_special_linear.hdf5'
+call experiment_special(X0, t0, tmax, tc, tolerances, f, dp87, outputfilename, h0input = h0)
 
 
 end program
