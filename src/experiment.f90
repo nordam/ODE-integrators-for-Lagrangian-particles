@@ -4,7 +4,7 @@ module experiment_module
     use h5lt
     use parameters,          only: SP, DP, WP
     use interpolator_module, only: interpolator
-    use integrator_module,   only: integrate_fixed, integrate_variable
+    use integrator_module,   only: integrate_fixed, integrate_variable, integrate_special
     use output_module,       only: write_to_hdf5, create_hdf5_file, close_hdf5_file
 
     implicit none
@@ -237,5 +237,4 @@ module experiment_module
         call close_hdf5_file(file_id)
     end subroutine
 
-end module
 end module

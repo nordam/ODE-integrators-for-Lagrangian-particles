@@ -21,12 +21,10 @@ real(WP), dimension(5) :: timesteps
 real(WP), dimension(5) :: tolerances
 ! Derived type to evaluate interpolated current data
 type(interpolator) :: f
-! Loop variable
-integer  :: i
 ! Time
 real(wp) :: t0, tmax
 ! Initial timestep
-real(WP), parameter :: h0 = 60.0_WP
+real(WP), parameter :: h0 = 600.0_WP
 
 ! Variables for filenames
 character(len=256) :: inputfilename
@@ -75,17 +73,17 @@ tmax = tc(18)
 !!!! Run experiments for fixed timesteps !!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-outputfilename = 'experiment_rk1_linear.hdf5'
-call experiment_fixed(X0, t0, tmax, timesteps, f, rk1, outputfilename)
-
-outputfilename = 'experiment_rk2_linear.hdf5'
-call experiment_fixed(X0, t0, tmax, timesteps, f, rk2, outputfilename)
-
-outputfilename = 'experiment_rk3_linear.hdf5'
-call experiment_fixed(X0, t0, tmax, timesteps, f, rk3, outputfilename)
-
-outputfilename = 'experiment_rk4_linear.hdf5'
-call experiment_fixed(X0, t0, tmax, timesteps, f, rk4, outputfilename)
+!outputfilename = 'experiment_rk1_linear.hdf5'
+!call experiment_fixed(X0, t0, tmax, timesteps, f, rk1, outputfilename)
+!
+!outputfilename = 'experiment_rk2_linear.hdf5'
+!call experiment_fixed(X0, t0, tmax, timesteps, f, rk2, outputfilename)
+!
+!outputfilename = 'experiment_rk3_linear.hdf5'
+!call experiment_fixed(X0, t0, tmax, timesteps, f, rk3, outputfilename)
+!
+!outputfilename = 'experiment_rk4_linear.hdf5'
+!call experiment_fixed(X0, t0, tmax, timesteps, f, rk4, outputfilename)
 
 
 
@@ -96,12 +94,12 @@ call experiment_fixed(X0, t0, tmax, timesteps, f, rk4, outputfilename)
 outputfilename = 'experiment_bs32_linear.hdf5'
 call experiment_variable(X0, t0, tmax, tolerances, f, bs32, outputfilename, h0input = h0)
 
-outputfilename = 'experiment_dp54_linear.hdf5'
-call experiment_variable(X0, t0, tmax, tolerances, f, dp54, outputfilename, h0input = h0)
-
-outputfilename = 'experiment_dp87_linear.hdf5'
-call experiment_variable(X0, t0, tmax, tolerances, f, dp87, outputfilename, h0input = h0)
-
+!outputfilename = 'experiment_dp54_linear.hdf5'
+!call experiment_variable(X0, t0, tmax, tolerances, f, dp54, outputfilename, h0input = h0)
+!
+!outputfilename = 'experiment_dp87_linear.hdf5'
+!call experiment_variable(X0, t0, tmax, tolerances, f, dp87, outputfilename, h0input = h0)
+!
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -110,14 +108,14 @@ call experiment_variable(X0, t0, tmax, tolerances, f, dp87, outputfilename, h0in
 
 ! Passing list of timestamps for the currentdata as stoptimes
 
-outputfilename = 'experiment_bs32_special_linear.hdf5'
-call experiment_special(X0, t0, tmax, tc, tolerances, f, bs32, outputfilename, h0input = h0)
-
-outputfilename = 'experiment_dp54_special_linear.hdf5'
-call experiment_special(X0, t0, tmax, tc, tolerances, f, dp54, outputfilename, h0input = h0)
-
-outputfilename = 'experiment_dp87_special_linear.hdf5'
-call experiment_special(X0, t0, tmax, tc, tolerances, f, dp87, outputfilename, h0input = h0)
+!outputfilename = 'experiment_bs32_special_linear.hdf5'
+!call experiment_special(X0, t0, tmax, tc, tolerances, f, bs32, outputfilename, h0input = h0)
+!
+!outputfilename = 'experiment_dp54_special_linear.hdf5'
+!call experiment_special(X0, t0, tmax, tc, tolerances, f, dp54, outputfilename, h0input = h0)
+!
+!outputfilename = 'experiment_dp87_special_linear.hdf5'
+!call experiment_special(X0, t0, tmax, tc, tolerances, f, dp87, outputfilename, h0input = h0)
 
 
 end program

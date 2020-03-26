@@ -85,6 +85,10 @@ module integrator_module
         real(WP), dimension(size(X)) :: k1
         real(WP) :: t, h
         logical  :: accepted
+        ! Using these for debugging temporarily
+        !real(WP) :: h_old
+        !real(WP), dimension(size(X)) :: X0, X_old
+        !X0 = X
 
         ! Initialise
         t = t0
@@ -100,6 +104,9 @@ module integrator_module
         do while (t < tmax)
             ! Adjust last timestep to stop exactly at tmax
             h = min(h, tmax - t)
+            ! Keep track of these things for debugging for now
+            !X_old = X
+            !h_old = h
             ! Make step
             call method(X, t, h, f, k1, atol, rtol, accepted)
             ! Increment counters
@@ -108,6 +115,13 @@ module integrator_module
             else
                 Nrejected = Nrejected + 1
             endif
+            ! Finding out why x is sometimes out of area
+            !if (f%debugflag) then
+            !    print*, 'Debugging info:'
+            !    print*, 'X0 = ', X0
+            !    print*, 'X_old = ', X_old
+            !    print*, 'h_old = ', h_old
+            !endif
         end do
     end subroutine
 
@@ -143,7 +157,8 @@ module integrator_module
         end interface
         ! local variables
         real(WP), dimension(size(X)) :: k1
-        real(WP) :: t, h, tstop
+        real(WP) :: t, h, h_old
+        integer  :: istop
         logical  :: accepted
 
         ! Initialise
@@ -151,13 +166,9 @@ module integrator_module
         h = h0
         Naccepted = 0
         Nrejected = 0
-        ! Set tstop to the smallest number in the list of stoptimes,
-        ! which is still larger than t0.
-        tstop = t0 - 1
-        do i = 1, size(stoptimes)
-            if ( (tstop < t0) .and. (t0 < stoptimes(i)) ) then
-                tstop = stoptimes(i)
-            endif
+        ! Set istop to the first index in stoptimes larger than t0.
+        do istop = 1, size(stoptimes)
+            if (stoptimes(istop) > t0) exit
         enddo
         ! Evaluate k1 for first step (FSAL)
         ! Not all integrators can make use of this, but to keep the code simple
@@ -169,16 +180,21 @@ module integrator_module
             ! Adjust last timestep to stop exactly at tmax
             h = min(h, tmax - t)
             ! Handle discontinuities
-            if ( (t < tstop) .and. (tstop < (t + h)) ) then
+            if ( (t < stoptimes(istop)) .and. (stoptimes(istop) < (t + h)) ) then
                 ! About to step across a discontinuity.
                 ! Keep track of the current timestep.
                 h_old = h
                 ! Calculate remaining time until discontinuity.
-                h = tdata - t
+                h = stoptimes(istop) - t
                 ! Make step
                 call method(X, t, h, f, k1, atol, rtol, accepted)
-                ! Set timestep back to old value if step was accepted
-                if (accepted) h = h_old
+                ! Update book-keeping if step was accepted
+                if (accepted) then
+                    ! Set timestep back to old value
+                    h = h_old
+                    ! Increment istop to index of next discontinuity
+                    istop = istop + 1
+                endif
             else
                 ! Normal step, away from any discontinuities
                 ! Make step

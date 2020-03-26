@@ -11,6 +11,7 @@ public :: interpolator
 
 type interpolator
     type(bspline_3d) :: fvx, fvy
+    !logical          :: debugflag
     contains
         private
         procedure, public  :: eval => evaluate
@@ -26,6 +27,7 @@ contains
         real(WP), intent(in), dimension(:,:,:) :: gvx, gvy
         integer,  intent(in)                   :: order
         integer                                :: iflag
+        !this%debugflag = .false.
         call this%fvx%initialize(xc, yc, tc, gvx, order, order, order, iflag)
         if (iflag /= 0) then
             print*, this%fvx%status_message(iflag)
@@ -56,13 +58,27 @@ contains
         ! Interpolate x-component of velocity
         call this%fvx%evaluate(X(1), X(2), t, d, d, d, V(1), iflag)
         if (iflag /= 0) then
+            print*,
+            print*, '---------------------------------------------------------'
+            print*, 'Error in fvx'
             print*, this%fvx%status_message(iflag)
+            print*, X(1), X(2), t
+            print*, '---------------------------------------------------------'
+        !    this%debugflag = .true.
+        !else
+        !    this%debugflag = .false.
         endif
 
         ! Interpolate y-component of velocity
         call this%fvy%evaluate(X(1), X(2), t, d, d, d, V(2), iflag)
         if (iflag /= 0) then
             print*, this%fvy%status_message(iflag)
+            print*,
+            print*, '---------------------------------------------------------'
+            print*, 'Error in fvy'
+            print*, this%fvx%status_message(iflag)
+            print*, X(1), X(2), t
+            print*, '---------------------------------------------------------'
         endif
     end function
 
