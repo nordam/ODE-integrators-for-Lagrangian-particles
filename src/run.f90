@@ -43,7 +43,7 @@ inputfilename   = '../data/initial_positions_norkyst.txt'
 
 ! Timesteps and tolerances
 timesteps = (/ 3600, 1800, 1200, 900, 600  /)
-tolerances = (/ 1e-3_WP, 1e-4_WP, 1e-5_WP, 1e-6_WP, 1e-7_WP /)
+tolerances = (/ 1e-4_WP, 1e-5_WP, 1e-6_WP, 1e-7_WP, 1e-8_WP /)
 
 
 
@@ -54,7 +54,7 @@ tolerances = (/ 1e-3_WP, 1e-4_WP, 1e-5_WP, 1e-6_WP, 1e-7_WP /)
 ! Get data from NetCDF file
 call get_current(currentfilename, u, v, xc, yc, tc)
 ! Create interpolator from discrete data !!!!
-call f%init(xc, yc, tc, u, v, 6)
+call f%init(xc, yc, tc, u, v, 2)
 ! Deallocate temporary storage arrays
 ! (data is now copied and stored in interpolator)
 deallocate(u)
@@ -65,7 +65,7 @@ call read_initial_positions(inputfilename, X0)
 
 ! Duration of integration
 t0   = tc(6)
-tmax = tc(18)
+tmax = tc(6 + 72)
 
 
 
@@ -73,17 +73,17 @@ tmax = tc(18)
 !!!! Run experiments for fixed timesteps !!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-!outputfilename = 'experiment_rk1_linear.hdf5'
-!call experiment_fixed(X0, t0, tmax, timesteps, f, rk1, outputfilename)
-!
-!outputfilename = 'experiment_rk2_linear.hdf5'
-!call experiment_fixed(X0, t0, tmax, timesteps, f, rk2, outputfilename)
-!
-!outputfilename = 'experiment_rk3_linear.hdf5'
-!call experiment_fixed(X0, t0, tmax, timesteps, f, rk3, outputfilename)
-!
-!outputfilename = 'experiment_rk4_linear.hdf5'
-!call experiment_fixed(X0, t0, tmax, timesteps, f, rk4, outputfilename)
+outputfilename = 'experiment_rk1_linear.hdf5'
+call experiment_fixed(X0, t0, tmax, timesteps, f, rk1, outputfilename)
+
+outputfilename = 'experiment_rk2_linear.hdf5'
+call experiment_fixed(X0, t0, tmax, timesteps, f, rk2, outputfilename)
+
+outputfilename = 'experiment_rk3_linear.hdf5'
+call experiment_fixed(X0, t0, tmax, timesteps, f, rk3, outputfilename)
+
+outputfilename = 'experiment_rk4_linear.hdf5'
+call experiment_fixed(X0, t0, tmax, timesteps, f, rk4, outputfilename)
 
 
 
@@ -94,12 +94,12 @@ tmax = tc(18)
 outputfilename = 'experiment_bs32_linear.hdf5'
 call experiment_variable(X0, t0, tmax, tolerances, f, bs32, outputfilename, h0input = h0)
 
-!outputfilename = 'experiment_dp54_linear.hdf5'
-!call experiment_variable(X0, t0, tmax, tolerances, f, dp54, outputfilename, h0input = h0)
-!
-!outputfilename = 'experiment_dp87_linear.hdf5'
-!call experiment_variable(X0, t0, tmax, tolerances, f, dp87, outputfilename, h0input = h0)
-!
+outputfilename = 'experiment_dp54_linear.hdf5'
+call experiment_variable(X0, t0, tmax, tolerances, f, dp54, outputfilename, h0input = h0)
+
+outputfilename = 'experiment_dp87_linear.hdf5'
+call experiment_variable(X0, t0, tmax, tolerances, f, dp87, outputfilename, h0input = h0)
+
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -108,14 +108,14 @@ call experiment_variable(X0, t0, tmax, tolerances, f, bs32, outputfilename, h0in
 
 ! Passing list of timestamps for the currentdata as stoptimes
 
-!outputfilename = 'experiment_bs32_special_linear.hdf5'
-!call experiment_special(X0, t0, tmax, tc, tolerances, f, bs32, outputfilename, h0input = h0)
-!
-!outputfilename = 'experiment_dp54_special_linear.hdf5'
-!call experiment_special(X0, t0, tmax, tc, tolerances, f, dp54, outputfilename, h0input = h0)
-!
-!outputfilename = 'experiment_dp87_special_linear.hdf5'
-!call experiment_special(X0, t0, tmax, tc, tolerances, f, dp87, outputfilename, h0input = h0)
+outputfilename = 'experiment_bs32_special_linear.hdf5'
+call experiment_special(X0, t0, tmax, tc, tolerances, f, bs32, outputfilename, h0input = h0)
+
+outputfilename = 'experiment_dp54_special_linear.hdf5'
+call experiment_special(X0, t0, tmax, tc, tolerances, f, dp54, outputfilename, h0input = h0)
+
+outputfilename = 'experiment_dp87_special_linear.hdf5'
+call experiment_special(X0, t0, tmax, tc, tolerances, f, dp87, outputfilename, h0input = h0)
 
 
 end program

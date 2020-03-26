@@ -85,10 +85,6 @@ module integrator_module
         real(WP), dimension(size(X)) :: k1
         real(WP) :: t, h
         logical  :: accepted
-        ! Using these for debugging temporarily
-        !real(WP) :: h_old
-        !real(WP), dimension(size(X)) :: X0, X_old
-        !X0 = X
 
         ! Initialise
         t = t0
@@ -104,9 +100,6 @@ module integrator_module
         do while (t < tmax)
             ! Adjust last timestep to stop exactly at tmax
             h = min(h, tmax - t)
-            ! Keep track of these things for debugging for now
-            !X_old = X
-            !h_old = h
             ! Make step
             call method(X, t, h, f, k1, atol, rtol, accepted)
             ! Increment counters
@@ -115,13 +108,6 @@ module integrator_module
             else
                 Nrejected = Nrejected + 1
             endif
-            ! Finding out why x is sometimes out of area
-            !if (f%debugflag) then
-            !    print*, 'Debugging info:'
-            !    print*, 'X0 = ', X0
-            !    print*, 'X_old = ', X_old
-            !    print*, 'h_old = ', h_old
-            !endif
         end do
     end subroutine
 
