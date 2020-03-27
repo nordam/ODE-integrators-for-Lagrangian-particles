@@ -14,7 +14,7 @@ endif (NOT CMAKE_BUILD_TYPE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set (CMAKE_Fortran_FLAGS "-Wall")
 set (CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -pg -fimplicit-none -fbacktrace -fcheck=all")
-set (CMAKE_Fortran_FLAGS_RELEASE "-funroll-loops -O3 -mtune=native")
+set (CMAKE_Fortran_FLAGS_RELEASE "-O2 -mtune=native")
 
 
 # Files with modules and stuff
@@ -43,7 +43,7 @@ message ("++ NETCDF_INCLUDE_DIRS:  ${NETCDF_INCLUDE_DIRS}")
 
 # Need to link to the bspline-fortran library
 # https://github.com/jacobwilliams/bspline-fortran
-file (GLOB BSPLINE_LIBRARIES "${BSPLINE_LIBRARY_PATH}/*.so")
+file (GLOB BSPLINE_LIBRARIES "${BSPLINE_LIBRARY_PATH}/*.a")
 include_directories (${BSPLINE_LIBRARY_PATH})
 message ("++ BSPLINE_LIBRARY_PATH: ${BSPLINE_LIBRARY_PATH}")
 message ("++ BSPLINE_LIBRARIES:    ${BSPLINE_LIBRARIES}")

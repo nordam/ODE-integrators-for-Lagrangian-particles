@@ -43,7 +43,7 @@ module experiment_module
         real(WP), dimension(:,:), allocatable   :: X
         integer(hid_t)                          :: file_id
         integer                                 :: n, idt, Np
-        integer(DP)                             :: Nsteps
+        integer(DP), dimension(size(X0,2))      :: Nsteps
         real(WP)                                :: h, tic, toc
 
         ! Assuming that X0 has shape (2, Np) or (3, Np)
@@ -63,7 +63,7 @@ module experiment_module
             call cpu_time(tic)
             ! Transport each particle from time t0 to tmax
             do n = 1, Np
-                call integrate_fixed(X(:,n), t0, tmax, h, f, method, Nsteps)
+                call integrate_fixed(X(:,n), t0, tmax, h, f, method, Nsteps(n))
             end do
             ! Measure computational time
             call cpu_time(toc)
@@ -71,7 +71,7 @@ module experiment_module
             call write_to_hdf5(file_id, X, timesteps(idt))
             ! Print information on timing and number of steps:
             ! filename, timestep, runtime, accepted steps, rejected steps
-            print*, trim(outputfile), timesteps(idt), toc - tic, Nsteps, 0
+            print*, trim(outputfile), timesteps(idt), toc - tic, sum(Nsteps), 0
             flush(6)
         end do
         ! Clean up
@@ -113,7 +113,7 @@ module experiment_module
         real(WP), dimension(:,:), allocatable   :: X
         integer(hid_t)                          :: file_id
         integer                                 :: n, idt, Np
-        integer(DP)                             :: Naccepted, Nrejected
+        integer(DP), dimension(size(X0,2))      :: Naccepted, Nrejected
         real(WP)                                :: h0, tol, tic, toc
 
         ! Assuming that X0 has shape (2, Np) or (3, Np)
@@ -140,17 +140,19 @@ module experiment_module
             ! Measure computational time
             call cpu_time(tic)
             ! Transport each particle from time t0 to tmax
+            !$OMP PARALLEL DO
             do n = 1, Np
                 call integrate_variable(X(:,n), t0, tmax, h0, f, method, &
-                        tol, tol, Naccepted, Nrejected)
+                        tol, tol, Naccepted(n), Nrejected(n))
             end do
+            !$OMP END PARALLEL DO
             ! Measure computational time
             call cpu_time(toc)
             ! Write end positions to hdf5 file
             call write_to_hdf5(file_id, X, tolerances(idt))
             ! Print information on timing and number of steps:
             ! filename, tolerance, runtime, accepted steps, rejected steps
-            print*, trim(outputfile), tol, toc - tic, Naccepted, Nrejected
+            print*, trim(outputfile), tol, toc - tic, sum(Naccepted), sum(Nrejected)
             flush(6)
         end do
         ! Clean up
@@ -192,7 +194,7 @@ module experiment_module
         real(WP), dimension(:,:), allocatable   :: X
         integer(hid_t)                          :: file_id
         integer                                 :: n, idt, Np
-        integer(DP)                             :: Naccepted, Nrejected
+        integer(DP), dimension(size(X0,2))      :: Naccepted, Nrejected
         real(WP)                                :: h0, tol, tic, toc
 
         ! Assuming that X0 has shape (2, Np) or (3, Np)
@@ -221,7 +223,7 @@ module experiment_module
             ! Transport each particle from time t0 to tmax
             do n = 1, Np
                 call integrate_special(X(:,n), t0, tmax, h0, stoptimes, f, method, &
-                        tol, tol, Naccepted, Nrejected)
+                        tol, tol, Naccepted(n), Nrejected(n))
             end do
             ! Measure computational time
             call cpu_time(toc)
@@ -229,7 +231,7 @@ module experiment_module
             call write_to_hdf5(file_id, X, tolerances(idt))
             ! Print information on timing and number of steps:
             ! filename, tolerance, runtime, accepted steps, rejected steps
-            print*, trim(outputfile), tol, toc - tic, Naccepted, Nrejected
+            print*, trim(outputfile), tol, toc - tic, sum(Naccepted), sum(Nrejected)
             flush(6)
         end do
         ! Clean up

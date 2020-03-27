@@ -26,11 +26,11 @@ contains
         real(WP), intent(in), dimension(:,:,:) :: gvx, gvy
         integer,  intent(in)                   :: order
         integer                                :: iflag
-        call this%fvx%initialize(xc, yc, tc, gvx, order, order, order, iflag)
+        call this%fvx%initialize(xc, yc, tc, gvx, order, order, order, iflag, extrap = .true.)
         if (iflag /= 0) then
             print*, this%fvx%status_message(iflag)
         endif
-        call this%fvy%initialize(xc, yc, tc, gvy, order, order, order, iflag)
+        call this%fvy%initialize(xc, yc, tc, gvy, order, order, order, iflag, extrap = .true.)
         if (iflag /= 0) then
             print*, this%fvy%status_message(iflag)
         endif
