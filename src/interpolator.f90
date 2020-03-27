@@ -15,9 +15,17 @@ type interpolator
         private
         procedure, public  :: eval => evaluate
         procedure, public  :: init => initialize
+        procedure, public  :: destroy => destroy
 end type interpolator
 
 contains
+
+    subroutine destroy(this)
+        implicit none
+        class(interpolator), intent(inout)     :: this
+        call this%fvx%destroy()
+        call this%fvy%destroy()
+    end subroutine
 
     subroutine initialize(this, xc, yc, tc, gvx, gvy, order)
         implicit none
