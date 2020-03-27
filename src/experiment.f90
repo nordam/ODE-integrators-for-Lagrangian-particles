@@ -140,12 +140,10 @@ module experiment_module
             ! Measure computational time
             call cpu_time(tic)
             ! Transport each particle from time t0 to tmax
-            !$OMP PARALLEL DO
             do n = 1, Np
                 call integrate_variable(X(:,n), t0, tmax, h0, f, method, &
                         tol, tol, Naccepted(n), Nrejected(n))
             end do
-            !$OMP END PARALLEL DO
             ! Measure computational time
             call cpu_time(toc)
             ! Write end positions to hdf5 file
