@@ -49,14 +49,51 @@ message ("++ BSPLINE_LIBRARY_PATH: ${BSPLINE_LIBRARY_PATH}")
 message ("++ BSPLINE_LIBRARIES:    ${BSPLINE_LIBRARIES}")
 
 
+
 #### Simple test program
 add_executable (testprogram "src/test.f90" ${fortran_modules})
 target_link_libraries (testprogram ${BSPLINE_LIBRARIES})
 target_link_libraries (testprogram ${HDF5_LIBRARIES})
 target_link_libraries (testprogram ${NETCDF_LIBRARIES})
 
-#### Simple test program with current data
-add_executable (run "src/run.f90" ${fortran_modules})
-target_link_libraries (run ${BSPLINE_LIBRARIES})
-target_link_libraries (run ${HDF5_LIBRARIES})
-target_link_libraries (run ${NETCDF_LIBRARIES})
+#### Run simulations with current data
+add_executable (run_norkyst "src/run_norkyst.f90" ${fortran_modules})
+target_link_libraries (run_norkyst ${BSPLINE_LIBRARIES})
+target_link_libraries (run_norkyst ${HDF5_LIBRARIES})
+target_link_libraries (run_norkyst ${NETCDF_LIBRARIES})
+
+#### Run simulations with current data
+add_executable (run_nordic "src/run_nordic.f90" ${fortran_modules})
+target_link_libraries (run_nordic ${BSPLINE_LIBRARIES})
+target_link_libraries (run_nordic ${HDF5_LIBRARIES})
+target_link_libraries (run_nordic ${NETCDF_LIBRARIES})
+
+#### Run simulations with current data
+add_executable (run_arctic "src/run_arctic.f90" ${fortran_modules})
+target_link_libraries (run_arctic ${BSPLINE_LIBRARIES})
+target_link_libraries (run_arctic ${HDF5_LIBRARIES})
+target_link_libraries (run_arctic ${NETCDF_LIBRARIES})
+
+
+
+
+#### Reference solutions ####
+
+
+#### Run simulations with current data
+add_executable (run_norkyst_ref "src/run_norkyst_ref.f90" ${fortran_modules})
+target_link_libraries (run_norkyst_ref ${BSPLINE_LIBRARIES})
+target_link_libraries (run_norkyst_ref ${HDF5_LIBRARIES})
+target_link_libraries (run_norkyst_ref ${NETCDF_LIBRARIES})
+
+#### Run simulations with current data
+add_executable (run_nordic_ref "src/run_nordic_ref.f90" ${fortran_modules})
+target_link_libraries (run_nordic_ref ${BSPLINE_LIBRARIES})
+target_link_libraries (run_nordic_ref ${HDF5_LIBRARIES})
+target_link_libraries (run_nordic_ref ${NETCDF_LIBRARIES})
+
+#### Run simulations with current data
+add_executable (run_arctic_ref "src/run_arctic_ref.f90" ${fortran_modules})
+target_link_libraries (run_arctic_ref ${BSPLINE_LIBRARIES})
+target_link_libraries (run_arctic_ref ${HDF5_LIBRARIES})
+target_link_libraries (run_arctic_ref ${NETCDF_LIBRARIES})
