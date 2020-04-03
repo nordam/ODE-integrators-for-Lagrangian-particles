@@ -8,46 +8,60 @@ implicit none
 private
 public :: interpolator
 
+interface
+    function rhs_interface(X, t) result( val )
+        import :: WP
+        real(WP), dimension(:)       :: X
+        real(WP)                     :: t
+        real(WP), dimension(size(X)) :: val
+    end function
+end interface
 
 type interpolator
+    private
     type(bspline_3d) :: fvx, fvy
+    procedure(rhs_interface), nopass, pointer, public  :: f
     contains
         private
-        procedure, public  :: eval => evaluate
         procedure, public  :: init => initialize
         procedure, public  :: destroy => destroy
 end type interpolator
 
+class(interpolator), pointer :: this
+
 contains
 
-    subroutine destroy(this)
+    subroutine destroy(this_)
         implicit none
-        class(interpolator), intent(inout)     :: this
-        call this%fvx%destroy()
-        call this%fvy%destroy()
+        class(interpolator), intent(inout)     :: this_
+        call this_ % fvx % destroy()
+        call this_ % fvy % destroy()
     end subroutine
 
-    subroutine initialize(this, xc, yc, tc, gvx, gvy, order)
+    subroutine initialize(this_, xc, yc, tc, gvx, gvy, order)
         implicit none
-        class(interpolator), intent(inout)     :: this
+        class(interpolator), intent(inout)     :: this_
         real(WP), intent(in), dimension(:)     :: xc, yc, tc
         real(WP), intent(in), dimension(:,:,:) :: gvx, gvy
         integer,  intent(in)                   :: order
         integer                                :: iflag
-        call this%fvx%initialize(xc, yc, tc, gvx, order, order, order, iflag, extrap = .true.)
+        call this_ % fvx % initialize(xc, yc, tc, gvx, order, order, order, iflag, extrap = .true.)
         if (iflag /= 0) then
-            print*, this%fvx%status_message(iflag)
+            print*, this_ % fvx % status_message(iflag)
         endif
-        call this%fvy%initialize(xc, yc, tc, gvy, order, order, order, iflag, extrap = .true.)
+        call this_ % fvy % initialize(xc, yc, tc, gvy, order, order, order, iflag, extrap = .true.)
         if (iflag /= 0) then
-            print*, this%fvy%status_message(iflag)
+            print*, this_ % fvy % status_message(iflag)
         endif
+        ! Assoctiate this_ % f with the evaluate function
+        this_ % f => evaluate
+        ! assoctiate globally accessible pointer this with this_ instance
+        this => this_
     end subroutine
 
-    function evaluate(this, X, t) result(V)
+    function evaluate(X, t) result(V)
         implicit none
         !!!! inputs !!!!
-        class(interpolator),    intent(inout) :: this
         real(WP), dimension(2), intent(in)    :: X
         real(WP),               intent(in)    :: t
 
