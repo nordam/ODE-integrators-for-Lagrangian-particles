@@ -34,7 +34,7 @@ character(len=256) :: currentfilename
 
 ! Current data and initial positions
 currentfilename = '../data/Nordic-4km.nc'
-inputfilename   = '../data/initial_positions_nordic4.txt'
+inputfilename   = '../data/initial_positions_nordic.txt'
 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
