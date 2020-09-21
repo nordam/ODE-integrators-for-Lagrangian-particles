@@ -13,6 +13,7 @@ module experiment_module
     private
     public :: experiment_fixed, experiment_variable, experiment_special
     public :: run_all_fixed, run_all_variable, run_all_special
+    public :: get_output_filename
 
     contains
 
@@ -21,32 +22,33 @@ module experiment_module
 !!!!   Subroutines to run experiments for all variants of integration methods    !!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    subroutine run_all_fixed(X0, t0, tmax, timesteps, f, outputfilenamesuffix)
+    subroutine run_all_fixed(X0, t0, tmax, timesteps, f, dataset_name, order)
         ! Run experiment for all fixed-step integrators, currently rk1 - rk4.
         implicit none
         ! Input variables
         real(WP), dimension(:,:), intent(in)    :: X0
         real(WP), dimension(:),   intent(in)    :: timesteps
         real(WP),                 intent(in)    :: t0, tmax
-        character(len=*),         intent(in)    :: suffix
+        character(len=*),         intent(in)    :: dataset_name
+        integer,                  intent(in)    :: order
         type(interpolator),       intent(inout) :: f
         ! Local variable
-        character(len=256)                      :: outputfilename
+        character(len=256)                      :: output_filename
 
-        outputfilename = trim(output_folder) // 'experiment_rk1_' // trim(suffix) // '.hdf5'
-        call experiment_fixed(X0, t0, tmax, timesteps, f, rk1, outputfilename)
+        output_filename = get_output_filename('experiment', 'rk1', dataset_name, order)
+        call experiment_fixed(X0, t0, tmax, timesteps, f, rk1, output_filename)
 
-        outputfilename = trim(output_folder) // 'experiment_rk2_' // trim(suffix) // '.hdf5'
-        call experiment_fixed(X0, t0, tmax, timesteps, f, rk2, outputfilename)
+        output_filename = get_output_filename('experiment', 'rk2', dataset_name, order)
+        call experiment_fixed(X0, t0, tmax, timesteps, f, rk2, output_filename)
 
-        outputfilename = trim(output_folder) // 'experiment_rk3_' // trim(suffix) // '.hdf5'
-        call experiment_fixed(X0, t0, tmax, timesteps, f, rk3, outputfilename)
+        output_filename = get_output_filename('experiment', 'rk3', dataset_name, order)
+        call experiment_fixed(X0, t0, tmax, timesteps, f, rk3, output_filename)
 
-        outputfilename = trim(output_folder) // 'experiment_rk4_' // trim(suffix) // '.hdf5'
-        call experiment_fixed(X0, t0, tmax, timesteps, f, rk4, outputfilename)
+        output_filename = get_output_filename('experiment', 'rk4', dataset_name, order)
+        call experiment_fixed(X0, t0, tmax, timesteps, f, rk4, output_filename)
     end subroutine
 
-    subroutine run_all_variable(X0, t0, tmax, tolerances, f, outputfilenamesuffix, h0input)
+    subroutine run_all_variable(X0, t0, tmax, tolerances, f, dataset_name, order, h0input)
         ! Run experiment for all variable-step integrators, currently bs32, dp54, dp87
         implicit none
         ! Input variables
@@ -54,22 +56,23 @@ module experiment_module
         real(WP), dimension(:),   intent(in)    :: tolerances
         real(WP),                 intent(in)    :: t0, tmax
         real(WP), optional,       intent(in)    :: h0input
-        character(len=*),         intent(in)    :: suffix
+        character(len=*),         intent(in)    :: dataset_name
+        integer,                  intent(in)    :: order
         type(interpolator),       intent(inout) :: f
         ! Local variable
-        character(len=256)                      :: outputfilename
+        character(len=256)                      :: output_filename
 
-        outputfilename = trim(output_folder) // 'experiment_bs32_' // trim(suffix) // '.hdf5'
-        call experiment_variable(X0, t0, tmax, tolerances, f, bs32, outputfilename, h0input)
+        output_filename = get_output_filename('experiment', 'bs32', dataset_name, order)
+        call experiment_variable(X0, t0, tmax, tolerances, f, bs32, output_filename, h0input)
 
-        outputfilename = trim(output_folder) // 'experiment_dp54_' // trim(suffix) // '.hdf5'
-        call experiment_variable(X0, t0, tmax, tolerances, f, dp54, outputfilename, h0input)
+        output_filename = get_output_filename('experiment', 'dp54', dataset_name, order)
+        call experiment_variable(X0, t0, tmax, tolerances, f, dp54, output_filename, h0input)
 
-        outputfilename = trim(output_folder) // 'experiment_dp87_' // trim(suffix) // '.hdf5'
-        call experiment_variable(X0, t0, tmax, tolerances, f, dp87, outputfilename, h0input)
+        output_filename = get_output_filename('experiment', 'dp87', dataset_name, order)
+        call experiment_variable(X0, t0, tmax, tolerances, f, dp87, output_filename, h0input)
     end subroutine
 
-    subroutine run_all_special(X0, t0, tmax, stoptimes, tolerances, f, outputfilenamesuffix, h0input)
+    subroutine run_all_special(X0, t0, tmax, stoptimes, tolerances, f, dataset_name, order, h0input)
         ! Run experiment for all variable-step integrators, currently bs32, dp54, dp87,
         ! using the special purpose scheme that stops integration at discontinutities.
         implicit none
@@ -79,19 +82,20 @@ module experiment_module
         real(WP), dimension(:),   intent(in)    :: stoptimes
         real(WP),                 intent(in)    :: t0, tmax
         real(WP), optional,       intent(in)    :: h0input
-        character(len=*),         intent(in)    :: outputfilenamesuffix
+        character(len=*),         intent(in)    :: dataset_name
+        integer,                  intent(in)    :: order
         type(interpolator),       intent(inout) :: f
         ! Local variable
-        character(len=256)                      :: outputfilename
- 
-        outputfilename = trim(output_folder) // 'experiment_bs32s_' // trim(suffix) // '.hdf5'
-        call experiment_special(X0, t0, tmax, stoptimes, tolerances, f, bs32, trim(outputfilename), h0input)
+        character(len=256)                      :: output_filename
 
-        outputfilename = trim(output_folder) // 'experiment_dp54s_' // trim(suffix) // '.hdf5'
-        call experiment_special(X0, t0, tmax, stoptimes, tolerances, f, dp54, trim(outputfilename), h0input)
+        output_filename = get_output_filename('experiment', 'bs32s', dataset_name, order)
+        call experiment_special(X0, t0, tmax, stoptimes, tolerances, f, bs32, trim(output_filename), h0input)
 
-        outputfilename = trim(output_folder) // 'experiment_dp87s_' // trim(suffix) // '.hdf5'
-        call experiment_special(X0, t0, tmax, stoptimes, tolerances, f, dp87, trim(outputfilename), h0input)
+        output_filename = get_output_filename('experiment', 'dp54s', dataset_name, order)
+        call experiment_special(X0, t0, tmax, stoptimes, tolerances, f, dp54, trim(output_filename), h0input)
+
+        output_filename = get_output_filename('experiment', 'dp87s', dataset_name, order)
+        call experiment_special(X0, t0, tmax, stoptimes, tolerances, f, dp87, trim(output_filename), h0input)
     end subroutine
 
 
@@ -100,7 +104,7 @@ module experiment_module
     !!!! Subroutine to run experiment with fixed-step Runge-Kutta method !!!!
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    subroutine experiment_fixed(X0, t0, tmax, timesteps, f, method, outputfilename)
+    subroutine experiment_fixed(X0, t0, tmax, timesteps, f, method, output_filename)
         ! This subroutine takes the initial positions at time t0, for a number,
         ! Np, of particles, along with a list of timesteps, an interpolator
         ! object to evaluate the velocity field, and a numerical ODE integrator.
@@ -111,7 +115,7 @@ module experiment_module
         real(WP), dimension(:,:), intent(in)    :: X0
         real(WP), dimension(:),   intent(in)    :: timesteps
         real(WP),                 intent(in)    :: t0, tmax
-        character(len=*),         intent(in)    :: outputfilename
+        character(len=*),         intent(in)    :: output_filename
         type(interpolator),       intent(inout) :: f
         interface
             subroutine method(X, t, h, f)
@@ -135,7 +139,7 @@ module experiment_module
         allocate(X( size(X0,1), size(X0,2) ))
 
         ! Create file for output
-        call create_hdf5_file(outputfilename, file_id)
+        call create_hdf5_file(output_filename, file_id)
 
         ! Scan through timesteps
         do idt = 1, size(timesteps)
@@ -154,7 +158,7 @@ module experiment_module
             call write_to_hdf5(file_id, X, timesteps(idt))
             ! Print information on timing and number of steps:
             ! filename, timestep, runtime, accepted steps, rejected steps
-            print*, trim(outputfilename), timesteps(idt), toc - tic, sum(Nsteps), 0
+            print*, trim(output_filename), timesteps(idt), toc - tic, sum(Nsteps), 0
             flush(6)
         end do
         ! Clean up
@@ -168,7 +172,7 @@ module experiment_module
     !!!! Subroutine to run experiment with variable-step Runge-Kutta method !!!!
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    subroutine experiment_variable(X0, t0, tmax, tolerances, f, method, outputfilename, h0input)
+    subroutine experiment_variable(X0, t0, tmax, tolerances, f, method, output_filename, h0input)
         ! This subroutine takes the initial positions at time t0, for a number,
         ! Np, of particles, along with a list of timesteps, an interpolator
         ! object to evaluate the velocity field, and a numerical ODE integrator.
@@ -180,7 +184,7 @@ module experiment_module
         real(WP), dimension(:),   intent(in)    :: tolerances
         real(WP),                 intent(in)    :: t0, tmax
         real(WP), optional,       intent(in)    :: h0input
-        character(len=*),         intent(in)    :: outputfilename
+        character(len=*),         intent(in)    :: output_filename
         type(interpolator),       intent(inout) :: f
         interface
             subroutine method(X, t, h, f, k1, atol, rtol, accepted)
@@ -205,7 +209,7 @@ module experiment_module
         allocate(X( size(X0,1), size(X0,2) ))
 
         ! Create file for output
-        call create_hdf5_file(outputfilename, file_id)
+        call create_hdf5_file(output_filename, file_id)
 
         ! Initial timestep, setting default value if not supplied
         if (present(h0input)) then
@@ -233,7 +237,7 @@ module experiment_module
             call write_to_hdf5(file_id, X, tolerances(idt))
             ! Print information on timing and number of steps:
             ! filename, tolerance, runtime, accepted steps, rejected steps
-            print*, trim(outputfilename), tol, toc - tic, sum(Naccepted), sum(Nrejected)
+            print*, trim(output_filename), tol, toc - tic, sum(Naccepted), sum(Nrejected)
             flush(6)
         end do
         ! Clean up
@@ -246,7 +250,7 @@ module experiment_module
     !!!! Subroutine to run experiment with variable-step Runge-Kutta method !!!!
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    subroutine experiment_special(X0, t0, tmax, stoptimes, tolerances, f, method, outputfilename, h0input)
+    subroutine experiment_special(X0, t0, tmax, stoptimes, tolerances, f, method, output_filename, h0input)
         ! This subroutine takes the initial positions at time t0, for a number,
         ! Np, of particles, along with a list of timesteps, an interpolator
         ! object to evaluate the velocity field, and a numerical ODE integrator.
@@ -259,7 +263,7 @@ module experiment_module
         real(WP), dimension(:),   intent(in)    :: tolerances
         real(WP),                 intent(in)    :: t0, tmax
         real(WP), optional,       intent(in)    :: h0input
-        character(len=*),         intent(in)    :: outputfilename
+        character(len=*),         intent(in)    :: output_filename
         type(interpolator),       intent(inout) :: f
         interface
             subroutine method(X, t, h, f, k1, atol, rtol, accepted)
@@ -284,7 +288,7 @@ module experiment_module
         allocate(X( size(X0,1), size(X0,2) ))
 
         ! Create file for output
-        call create_hdf5_file(outputfilename, file_id)
+        call create_hdf5_file(output_filename, file_id)
 
         ! Initial timestep, setting default value if not supplied
         if (present(h0input)) then
@@ -312,12 +316,52 @@ module experiment_module
             call write_to_hdf5(file_id, X, tolerances(idt))
             ! Print information on timing and number of steps:
             ! filename, tolerance, runtime, accepted steps, rejected steps
-            print*, trim(outputfilename), tol, toc - tic, sum(Naccepted), sum(Nrejected)
+            print*, trim(output_filename), tol, toc - tic, sum(Naccepted), sum(Nrejected)
             flush(6)
         end do
         ! Clean up
         deallocate(X)
         call close_hdf5_file(file_id)
     end subroutine
+
+    ! Convenience functions to generate output filenames
+    function get_output_filename(prefix, integrator_name, dataset_name, order) result(output_filename)
+        use parameters, only: output_folder
+        implicit none
+        character(len=*), intent(in) :: prefix
+        character(len=*), intent(in) :: integrator_name
+        character(len=*), intent(in) :: dataset_name
+        integer,            intent(in) :: order
+        character(len=256)             :: output_filename
+        output_filename = trim(output_folder) // trim(prefix) &
+            & // '_' // trim(integrator_name) // '_' // trim(dataset_name) &
+            & // '_' // trim(order_suffix(order)) // '.hdf5'
+        print*, 'output_folder = ', trim(output_folder)
+        print*, 'prefix = ', trim(prefix)
+        print*, 'integrator_name = ', trim(integrator_name)
+        print*, 'dataset_name = ', trim(dataset_name)
+        print*, 'order_suffix(order) = ', trim(order_suffix(order))
+        print*, 'output_filename = ', trim(output_filename)
+    end function
+
+    function order_suffix(order)
+        implicit none
+        integer,          intent(in) :: order
+        character(len=12)            :: order_suffix
+        if (order == 2) then
+            order_suffix = 'linear'
+        else if (order == 3) then
+            order_suffix = 'quadractic'
+        else if (order == 4) then
+            order_suffix = 'cubic'
+        else if (order == 5) then
+            order_suffix = 'quadic?'
+        else if (order == 6) then
+            order_suffix = 'quintic'
+        else
+            print*, 'Unsupported order: ', order
+            stop
+        endif
+    end function
 
 end module
