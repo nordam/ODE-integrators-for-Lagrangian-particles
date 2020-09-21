@@ -2,7 +2,7 @@ module experiment_module
 
     use hdf5
     use h5lt
-    use parameters,             only: SP, DP, WP
+    use parameters,             only: SP, DP, WP, output_folder
     use interpolator_module,    only: interpolator
     use integrator_module,      only: rk1, rk2, rk3, rk4
     use integrator_module,      only: bs32, dp54, dp87
@@ -28,21 +28,21 @@ module experiment_module
         real(WP), dimension(:,:), intent(in)    :: X0
         real(WP), dimension(:),   intent(in)    :: timesteps
         real(WP),                 intent(in)    :: t0, tmax
-        character(len=*),         intent(in)    :: outputfilenamesuffix
+        character(len=*),         intent(in)    :: suffix
         type(interpolator),       intent(inout) :: f
         ! Local variable
         character(len=256)                      :: outputfilename
 
-        outputfilename = 'experiment_rk1_' // trim(outputfilenamesuffix) // '.hdf5'
+        outputfilename = trim(output_folder) // 'experiment_rk1_' // trim(suffix) // '.hdf5'
         call experiment_fixed(X0, t0, tmax, timesteps, f, rk1, outputfilename)
 
-        outputfilename = 'experiment_rk2_' // trim(outputfilenamesuffix) // '.hdf5'
+        outputfilename = trim(output_folder) // 'experiment_rk2_' // trim(suffix) // '.hdf5'
         call experiment_fixed(X0, t0, tmax, timesteps, f, rk2, outputfilename)
 
-        outputfilename = 'experiment_rk3_' // trim(outputfilenamesuffix) // '.hdf5'
+        outputfilename = trim(output_folder) // 'experiment_rk3_' // trim(suffix) // '.hdf5'
         call experiment_fixed(X0, t0, tmax, timesteps, f, rk3, outputfilename)
 
-        outputfilename = 'experiment_rk4_' // trim(outputfilenamesuffix) // '.hdf5'
+        outputfilename = trim(output_folder) // 'experiment_rk4_' // trim(suffix) // '.hdf5'
         call experiment_fixed(X0, t0, tmax, timesteps, f, rk4, outputfilename)
     end subroutine
 
@@ -54,18 +54,18 @@ module experiment_module
         real(WP), dimension(:),   intent(in)    :: tolerances
         real(WP),                 intent(in)    :: t0, tmax
         real(WP), optional,       intent(in)    :: h0input
-        character(len=*),         intent(in)    :: outputfilenamesuffix
+        character(len=*),         intent(in)    :: suffix
         type(interpolator),       intent(inout) :: f
         ! Local variable
         character(len=256)                      :: outputfilename
 
-        outputfilename = 'experiment_bs32_' // trim(outputfilenamesuffix) // '.hdf5'
+        outputfilename = trim(output_folder) // 'experiment_bs32_' // trim(suffix) // '.hdf5'
         call experiment_variable(X0, t0, tmax, tolerances, f, bs32, outputfilename, h0input)
 
-        outputfilename = 'experiment_dp54_' // trim(outputfilenamesuffix) // '.hdf5'
+        outputfilename = trim(output_folder) // 'experiment_dp54_' // trim(suffix) // '.hdf5'
         call experiment_variable(X0, t0, tmax, tolerances, f, dp54, outputfilename, h0input)
 
-        outputfilename = 'experiment_dp87_' // trim(outputfilenamesuffix) // '.hdf5'
+        outputfilename = trim(output_folder) // 'experiment_dp87_' // trim(suffix) // '.hdf5'
         call experiment_variable(X0, t0, tmax, tolerances, f, dp87, outputfilename, h0input)
     end subroutine
 
@@ -84,13 +84,13 @@ module experiment_module
         ! Local variable
         character(len=256)                      :: outputfilename
  
-        outputfilename = 'experiment_bs32_special_' // trim(outputfilenamesuffix) // '.hdf5'
+        outputfilename = trim(output_folder) // 'experiment_bs32s_' // trim(suffix) // '.hdf5'
         call experiment_special(X0, t0, tmax, stoptimes, tolerances, f, bs32, trim(outputfilename), h0input)
 
-        outputfilename = 'experiment_dp54_special_' // trim(outputfilenamesuffix) // '.hdf5'
+        outputfilename = trim(output_folder) // 'experiment_dp54s_' // trim(suffix) // '.hdf5'
         call experiment_special(X0, t0, tmax, stoptimes, tolerances, f, dp54, trim(outputfilename), h0input)
 
-        outputfilename = 'experiment_dp87_special_' // trim(outputfilenamesuffix) // '.hdf5'
+        outputfilename = trim(output_folder) // 'experiment_dp87s_' // trim(suffix) // '.hdf5'
         call experiment_special(X0, t0, tmax, stoptimes, tolerances, f, dp87, trim(outputfilename), h0input)
     end subroutine
 

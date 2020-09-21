@@ -76,9 +76,9 @@ def main():
     m.drawmeridians(np.arange(-180.,181.,2.), latmax = 90, linewidth = linewidth, alpha = alpha, labels = [0,0,0,1])
 
     files = OrderedDict({})
-    files['Selection from NorKyst 800 m'] = 'Norkyst-800m.nc'
-    files['Selection from Nordic 4 km'] = 'Nordic-4km.nc'
-    files['Selection from Arctic 20 km'] = 'Arctic-20km.nc'
+    files['Selection from NorKyst 800 m'] = 'norkyst800.nc'
+    files['Selection from Nordic 4 km'] = 'nordic4.nc'
+    files['Selection from Arctic 20 km'] = 'arctic20.nc'
     for k, v in files.items():
         plot_boundary(v, m, ax, label = k)
 
