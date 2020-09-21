@@ -28,11 +28,9 @@ This directory contains the fortran source code to run the simulations.
   * hdf5, with fortran interface
   * netcdf, with fortran interface
   * a recent version of gfortran
-* Create a separate build directory somewhere
-* We use cmake to configure the build, and we need to pass information about the location of the different libraries. Currently, the following seems to work (but could definitely be improved upon)
-* `PATH$PATH:PATH_TO_HDF5_LIBS:PATH_TO_HDF5_INCLUDES cmake PATH_TO_CMakeLists.txt -DBSPLINE_LIBRARY_PATH=PATH_TO_BSPLINE_LIBS -DNETCF_LIBRARY_PATH=PATH_TO_NETCDF_LIBS -DNETCDF_INCLUDE_DIRS=PATH_TO_NETCF_INCLUDES`
-  * `PATH_TO_HDF5_LIBS` should be the folder where `libhdf5_fortran.so` etc. are found
-  * `PATH_TO_HDF5_INCLUDES` should be the folder where the hdf5 header files are found, on my system the mod-files are in a subfolder of that folder, called `shared`
+* Go into the build directory (or create your own, somewhere)
+* We use cmake to configure the build, and we need to pass information about the location of the different libraries. The following works for me on xubuntu 18.04 with netcdf installed from apt-get. Adjust the paths to fit your system.
+* `cmake .. -DBSPLINE_LIBRARY_PATH=PATH_TO_BSPLINE_LIBS -DNETCF_LIBRARY_PATH=PATH_TO_NETCDF_LIBS -DNETCDF_INCLUDE_DIRS=PATH_TO_NETCF_INCLUDES -DCMAKE_BUILD_TYPE=RELEASE`
   * `PATH_TO_BSPLINE_LIBS` should be the folder where `bspline_module.o` and `bspline_module.mod` etc. are found
   * `PATH_TO_NETCDF_LIBS` should be the folder where `libnetcdf.so` and `libnetcdff.so` found
   * `PATH_TO_NETCDF_INCLUDES` should be the folder where `netcdf.h` and `netcdf.mod` etc. are found
