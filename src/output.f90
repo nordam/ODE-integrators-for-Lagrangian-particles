@@ -47,7 +47,7 @@ module output_module
         ! Initialize the hdf5 library
         call h5open_f(hdferr)
         ! Create output file
-        call h5fcreate_f(filename, h5f_acc_trunc_f, file_id, hdferr)
+        call h5fcreate_f(trim(filename) // '.hdf5', h5f_acc_trunc_f, file_id, hdferr)
     end subroutine create_hdf5_file
 
     subroutine close_hdf5_file(file_id)

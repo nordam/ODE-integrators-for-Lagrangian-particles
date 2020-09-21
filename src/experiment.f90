@@ -140,6 +140,9 @@ module experiment_module
 
         ! Create file for output
         call create_hdf5_file(output_filename, file_id)
+        ! Open text file for writing number of calls and runtime
+        open(42, file = trim(output_filename) // '.txt')
+        write(42,*) '# Timestep               Runtime                       Naccepted         Nrejected'
 
         ! Scan through timesteps
         do idt = 1, size(timesteps)
@@ -157,13 +160,14 @@ module experiment_module
             ! Write end positions to hdf5 file
             call write_to_hdf5(file_id, X, timesteps(idt))
             ! Print information on timing and number of steps:
-            ! filename, timestep, runtime, accepted steps, rejected steps
-            print*, trim(output_filename), timesteps(idt), toc - tic, sum(Nsteps), 0
-            flush(6)
+            ! timestep, runtime, accepted steps, rejected steps
+            write(42,*) timesteps(idt), toc - tic, sum(Nsteps), 0
+            flush(42)
         end do
         ! Clean up
         deallocate(X)
         call close_hdf5_file(file_id)
+        close(42)
     end subroutine
 
 
@@ -210,6 +214,9 @@ module experiment_module
 
         ! Create file for output
         call create_hdf5_file(output_filename, file_id)
+        ! Open text file for writing number of calls and runtime
+        open(42, file = trim(output_filename) // '.txt')
+        write(42,*) '# Timestep               Runtime                       Naccepted         Nrejected'
 
         ! Initial timestep, setting default value if not supplied
         if (present(h0input)) then
@@ -236,13 +243,14 @@ module experiment_module
             ! Write end positions to hdf5 file
             call write_to_hdf5(file_id, X, tolerances(idt))
             ! Print information on timing and number of steps:
-            ! filename, tolerance, runtime, accepted steps, rejected steps
-            print*, trim(output_filename), tol, toc - tic, sum(Naccepted), sum(Nrejected)
-            flush(6)
+            ! tolerance, runtime, accepted steps, rejected steps
+            write(42,*) tol, toc - tic, sum(Naccepted), sum(Nrejected)
+            flush(42)
         end do
         ! Clean up
         deallocate(X)
         call close_hdf5_file(file_id)
+        close(42)
     end subroutine
 
 
@@ -289,6 +297,9 @@ module experiment_module
 
         ! Create file for output
         call create_hdf5_file(output_filename, file_id)
+        ! Open text file for writing number of calls and runtime
+        open(42, file = trim(output_filename) // '.txt')
+        write(42,*) '# Timestep               Runtime                       Naccepted         Nrejected'
 
         ! Initial timestep, setting default value if not supplied
         if (present(h0input)) then
@@ -316,12 +327,13 @@ module experiment_module
             call write_to_hdf5(file_id, X, tolerances(idt))
             ! Print information on timing and number of steps:
             ! filename, tolerance, runtime, accepted steps, rejected steps
-            print*, trim(output_filename), tol, toc - tic, sum(Naccepted), sum(Nrejected)
-            flush(6)
+            write(42,*) tol, toc - tic, sum(Naccepted), sum(Nrejected)
+            flush(42)
         end do
         ! Clean up
         deallocate(X)
         call close_hdf5_file(file_id)
+        close(42)
     end subroutine
 
     ! Convenience functions to generate output filenames
@@ -335,13 +347,7 @@ module experiment_module
         character(len=256)             :: output_filename
         output_filename = trim(output_folder) // trim(prefix) &
             & // '_' // trim(integrator_name) // '_' // trim(dataset_name) &
-            & // '_' // trim(order_suffix(order)) // '.hdf5'
-        print*, 'output_folder = ', trim(output_folder)
-        print*, 'prefix = ', trim(prefix)
-        print*, 'integrator_name = ', trim(integrator_name)
-        print*, 'dataset_name = ', trim(dataset_name)
-        print*, 'order_suffix(order) = ', trim(order_suffix(order))
-        print*, 'output_filename = ', trim(output_filename)
+            & // '_' // trim(order_suffix(order))
     end function
 
     function order_suffix(order)
