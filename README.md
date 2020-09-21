@@ -35,7 +35,9 @@ This directory contains the fortran source code to run the simulations.
   * `netcdf_libs` should be the folder where `libnetcdf.so` and `libnetcdff.so` found. On my system, running xubuntu 18.04 with `libnetcdf-dev` and `libnetcdff-dev` installed from apt-get, these files are found in `/usr/lib/x86_64-linux-gnu`.
   * `netcdf_include` should be the folder where `netcdf.h` and `netcdf.mod` etc. are found. On my system, running xubuntu 18.04 with `libnetcdf-dev` and `libnetcdff-dev` installed from apt-get, these files are found in `/usr/include`.
 * Then running `make` should build the project. If that doesn't work, try running `make VERBOSE=1`, copy the last command, where the error occured, and see if all the paths are correct.
-* Running `make` will build three executables, one for each of the three different resolution datasets. Running these files will 
+* Running `make` will build six executables, two for each of the three different resolution datasets. Running, e.g., `run_norkyst` will run simulations with the NorKyst800m dataset as input, scanning through the 8 different timesteps and 11 different tolerances investigated in the paper. Running `run_norkyst_ref` will run simulations with a selection of shorter timesteps and stricter tolerances, in order to obtain reference solutions (see Appendix A in [Nordam & Duran (2020)](https://gmd.copernicus.org/preprints/gmd-2020-154/) for details).
+* Note that running these simulations takes a while (20-30 hours on a 3.3 GHz Intel Xeon CPU). The simulations all run on a single core and don't require very much memory, so some trivial parallelisation can be achieved by running all six at the same time.
+* Note also that the executables expect to find input data in `../data/`, and expect to be able to write their output to `../results/`. Adjust paths, or edit the code as required.
 
 ## Instructions for using the jupyter notebooks
 
