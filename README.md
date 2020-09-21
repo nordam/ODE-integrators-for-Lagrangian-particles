@@ -30,10 +30,10 @@ This directory contains the fortran source code to run the simulations.
   * a recent version of gfortran
 * Go into the build directory (or create your own, somewhere)
 * We use cmake to configure the build, and we need to pass information about the location of the different libraries. The following works for me on xubuntu 18.04 with netcdf installed from apt-get. Adjust the paths to fit your system.
-* `cmake .. -DBSPLINE_LIBRARY_PATH=PATH_TO_BSPLINE_LIBS -DNETCF_LIBRARY_PATH=PATH_TO_NETCDF_LIBS -DNETCDF_INCLUDE_DIRS=PATH_TO_NETCF_INCLUDES -DCMAKE_BUILD_TYPE=RELEASE`
-  * `PATH_TO_BSPLINE_LIBS` should be the folder where `bspline_module.o` and `bspline_module.mod` etc. are found
-  * `PATH_TO_NETCDF_LIBS` should be the folder where `libnetcdf.so` and `libnetcdff.so` found
-  * `PATH_TO_NETCDF_INCLUDES` should be the folder where `netcdf.h` and `netcdf.mod` etc. are found
+* `cmake .. -DBSPLINE_LIBRARY_PATH=bspline_path -DNETCF_LIBRARY_PATH=netcdf_libs -DNETCDF_INCLUDE_DIRS=netcdf_includes -DCMAKE_BUILD_TYPE=RELEASE`
+  * `bspline_path` should be the folder where `bspline_module.o` and `bspline_module.mod` etc. are found. This depends on where you built bspline-fortran.
+  * `netcdf_libs` should be the folder where `libnetcdf.so` and `libnetcdff.so` found. On my system, running xubuntu 18.04 with `libnetcdf-dev` and `libnetcdff-dev` installed from apt-get, these files are found in `/usr/lib/x86_64-linux-gnu`.
+  * `PATH_TO_NETCDF_INCLUDES` should be the folder where `netcdf.h` and `netcdf.mod` etc. are found. On my system, running xubuntu 18.04 with `libnetcdf-dev` and `libnetcdff-dev` installed from apt-get, these files are found in `/usr/include`.
 * Then running `make` should build the project. If that doesn't work, try running `make VERBOSE=1`, copy the last command, where the error occured, and see if all the paths are correct.
 
 ## Instructions for using the jupyter notebooks
