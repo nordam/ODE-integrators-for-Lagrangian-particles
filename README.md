@@ -26,7 +26,16 @@ This directory contains a tiny shell script which will run all six executables i
 
 ### src
 
-This directory contains the fortran source code to run the simulations.
+This directory contains the fortran source code to run the simulations:
+* `currentdata.f90` uses the netCDF library to read current data from the .nc files in the data folder.
+* `experiment.f90` contains some convenience functions to run a series of simulations.
+* `input.f90` contains functions to read initial particle positions from the .txt files in the data folder.
+* `integrator.f90` contains implementations of the integrators described in [Nordam & Duran (2020)](https://gmd.copernicus.org/preprints/gmd-2020-154/).
+* `interpolator.f90` defines a derived type used to conveniently hold interpolator objects from the bspline-fortran library.
+* `output.f90` contains functions to create and write hdf5 files with the particle positions after transport.
+* `parameters.f90` defines some parameters. Edit this file to changes paths, and expand range of timesteps or tolerances.
+* `run_*.f90` are three almost identical files, one for each dataset, to run a set of simulations.
+* `run_*_ref.f90` are three almost identical files, one for each dataset, to obtain reference solutions.
 
 ## Build instructions for fortran code
 
