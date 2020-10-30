@@ -16,7 +16,7 @@ This directory contain the ocean current datasets used to run the simulations, a
 
 This directory contains jupyter notebooks that are used to analyse and plot the results of running the simulations.
 
-### build
+### results
 
 This directory is where the simulation results will be stared. It initially contains only a .gitignore file ignoring everything but itself, ensuring that files in this folder do not clutter the git status.
 
